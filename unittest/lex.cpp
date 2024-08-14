@@ -157,3 +157,42 @@ TEST_F(lex_test, lexes_floating_point_numbers)
     EXPECT_EQ(tokens.at(2).type, token_t::number);
     EXPECT_EQ(tokens.at(2).value, "1.234");
 }
+
+TEST_F(lex_test, lexes_conditional_tokens_for_if_statements)
+{
+    test("if elif else");
+
+    ASSERT_EQ(tokens.size(), 3);
+    EXPECT_EQ(tokens.at(0).type, token_t::if_keyword);
+    EXPECT_EQ(tokens.at(0).value, "if");
+    
+    EXPECT_EQ(tokens.at(1).type, token_t::elif_keyword);
+    EXPECT_EQ(tokens.at(1).value, "elif");
+    
+    EXPECT_EQ(tokens.at(2).type, token_t::else_keyword);
+    EXPECT_EQ(tokens.at(2).value, "else");
+}
+
+TEST_F(lex_test, lexes_paranthesis_characters)
+{
+    test("()");
+
+    ASSERT_EQ(tokens.size(), 2);
+    EXPECT_EQ(tokens.at(0).type, token_t::open_paranthesis);
+    EXPECT_EQ(tokens.at(0).value, "(");
+    
+    EXPECT_EQ(tokens.at(1).type, token_t::closed_paranthesis);
+    EXPECT_EQ(tokens.at(1).value, ")");
+}
+
+TEST_F(lex_test, lexes_curly_bracket_characters)
+{
+    test("{}");
+
+    ASSERT_EQ(tokens.size(), 2);
+    EXPECT_EQ(tokens.at(0).type, token_t::open_curly_bracket);
+    EXPECT_EQ(tokens.at(0).value, "{");
+    
+    EXPECT_EQ(tokens.at(1).type, token_t::closed_curly_bracket);
+    EXPECT_EQ(tokens.at(1).value, "}");
+}

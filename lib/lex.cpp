@@ -12,11 +12,14 @@ const token empty_token{};
 
 const std::map<std::string, token_t> keywords
 {
-    {"int", token_t::integer_keyword},
-    {"float", token_t::floating_point_keyword},
     {"bool", token_t::boolean_keyword},
-    {"true", token_t::true_keyword},
+    {"elif", token_t::elif_keyword},
+    {"else", token_t::else_keyword},
     {"false", token_t::false_keyword},
+    {"float", token_t::floating_point_keyword},
+    {"if", token_t::if_keyword},
+    {"int", token_t::integer_keyword},
+    {"true", token_t::true_keyword},
 };
 
 std::vector<token> lex(const char* filename)
@@ -139,6 +142,38 @@ void read_token(token& t, std::vector<unsigned char>::const_iterator& iterator,
     {
         t.value = c;
         t.type = token_t::slash;
+        
+        ++iterator;
+        c = *iterator;
+    }
+    else if (c == '(')
+    {
+        t.value = c;
+        t.type = token_t::open_paranthesis;
+        
+        ++iterator;
+        c = *iterator;
+    }
+    else if (c == ')')
+    {
+        t.value = c;
+        t.type = token_t::closed_paranthesis;
+        
+        ++iterator;
+        c = *iterator;
+    }
+    else if (c == '{')
+    {
+        t.value = c;
+        t.type = token_t::open_curly_bracket;
+        
+        ++iterator;
+        c = *iterator;
+    }
+    else if (c == '}')
+    {
+        t.value = c;
+        t.type = token_t::closed_curly_bracket;
         
         ++iterator;
         c = *iterator;
