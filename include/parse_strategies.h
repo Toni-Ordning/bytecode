@@ -6,7 +6,10 @@
 
 enum class parse_strategy
 {
-    initialize
+    close_block,
+    if_statement,
+    initialize,
+    open_block,
 };
 
 parse_strategy get_parse_strategy(const token& t);

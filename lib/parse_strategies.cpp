@@ -5,13 +5,20 @@
 #include <functional>
 #include <map>
 
+static void close_block(std::vector<token>::const_iterator&);
+static void open_block(std::vector<token>::const_iterator&);
 static void parse_initialization(std::vector<token>::const_iterator&);
 static void parse_assignment(std::vector<token>::const_iterator&);
+static void parse_if_statement(std::vector<token>::const_iterator&);
+static void parse_boolean_expression(std::vector<token>::const_iterator& iterator);
 static uint8_t get_priority(token_t type);
 
 std::map<parse_strategy, std::function<void(std::vector<token>::const_iterator&)>> strategies
 {
+    {parse_strategy::close_block, close_block},
     {parse_strategy::initialize, parse_initialization},
+    {parse_strategy::if_statement, parse_if_statement},
+    {parse_strategy::open_block, open_block},
 };
 
 parse_strategy get_parse_strategy(const token& t)
@@ -22,6 +29,12 @@ parse_strategy get_parse_strategy(const token& t)
         case token_t::floating_point_keyword:
         case token_t::boolean_keyword:
             return parse_strategy::initialize;
+        case token_t::if_keyword:
+            return parse_strategy::if_statement;
+        case token_t::open_curly_bracket:
+            return parse_strategy::open_block;
+        case token_t::closed_curly_bracket:
+            return parse_strategy::close_block;
         default:
             throw "Unimplemented parsing strategy";
     }
@@ -131,4 +144,46 @@ static uint8_t get_priority(token_t type)
     }
 
     return 0;
+}
+
+static void parse_if_statement(std::vector<token>::const_iterator& iterator)
+{
+    parse_node* if_node = new parse_node(*iterator);
+    ++iterator;
+    
+    if (!parse_stack::is_empty())
+    {
+        if_node->parent = parse_stack::top();
+        parse_stack::top()->set_child(if_node);
+    }
+    
+    parse_stack::push(if_node);
+
+    parse_boolean_expression(iterator);
+}
+
+static void parse_boolean_expression(std::vector<token>::const_iterator& iterator)
+{
+    parse_node* node = new parse_node(*iterator);
+    ++iterator;
+
+    if (iterator->type == token_t::open_curly_bracket)
+    {
+        parse_stack::top()->set_child(node);
+        node->parent = parse_stack::top();
+    }
+    else
+    {
+        throw "Not implemented";
+    }
+}
+
+static void open_block(std::vector<token>::const_iterator& iterator)
+{
+    ++iterator;
+}
+
+static void close_block(std::vector<token>::const_iterator& iterator)
+{
+    ++iterator;
 }

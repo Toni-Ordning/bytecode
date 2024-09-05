@@ -1,46 +1,13 @@
-#include <gtest/gtest.h>
+#include "parse_test.h"
 
-#include "lex.h"
-#include "parse.h"
-#include "parse_stack.h"
+class parse_assignment_test : public parse_test {};
 
-class parse_test : public testing::Test
-{
-    protected:
-        parse_node* root = nullptr;
-
-        uint64_t get_node_count(parse_node* node, token_t type)
-        {
-            uint64_t count = 0;
-            if (node->left_child != nullptr)
-            {
-                count += get_node_count(node->left_child, type);
-            }
-            if (node->right_child != nullptr)
-            {
-                count += get_node_count(node->right_child, type);
-            }
-            
-            if (node->type == type)
-            {
-                ++count;
-            }
-
-            return count;
-        }
-
-        void TearDown() override
-        {
-            parse_stack::free();
-        }
-};
-
-TEST_F(parse_test, parsing_no_tokens_does_not_return_root_token)
+TEST_F(parse_assignment_test, parsing_no_tokens_does_not_return_root_token)
 {
     root = parse_tokens({});
 }
 
-TEST_F(parse_test, parses_integer_assignment_expression)
+TEST_F(parse_assignment_test, parses_integer_assignment_expression)
 {
     std::vector<token> tokens = lex_tokens("int i = 5;");
     root = parse_tokens(tokens);
@@ -59,7 +26,7 @@ TEST_F(parse_test, parses_integer_assignment_expression)
     EXPECT_EQ(node->value, "5");
 }
 
-TEST_F(parse_test, parses_floating_point_assignment_expression)
+TEST_F(parse_assignment_test, parses_floating_point_assignment_expression)
 {
     std::vector<token> tokens = lex_tokens("float f = 5.0;");
     root = parse_tokens(tokens);
@@ -78,7 +45,7 @@ TEST_F(parse_test, parses_floating_point_assignment_expression)
     EXPECT_EQ(node->value, "5.0");
 }
 
-TEST_F(parse_test, parses_boolean_assignment_expression)
+TEST_F(parse_assignment_test, parses_boolean_assignment_expression)
 {
     std::vector<token> tokens = lex_tokens("bool b = true;");
     root = parse_tokens(tokens);
@@ -97,7 +64,7 @@ TEST_F(parse_test, parses_boolean_assignment_expression)
     EXPECT_EQ(node->value, "true");
 }
 
-TEST_F(parse_test, parsing_multiple_assignment_expressions_produces_correct_amount_of_tokens)
+TEST_F(parse_assignment_test, parsing_multiple_assignment_expressions_produces_correct_amount_of_tokens)
 {
     std::stringstream input;
     input << "int i = 5;";
@@ -112,7 +79,7 @@ TEST_F(parse_test, parsing_multiple_assignment_expressions_produces_correct_amou
     EXPECT_EQ(get_node_count(root, token_t::number), 3);
 }
 
-TEST_F(parse_test, parsing_multiple_assignments_produces_tree_in_correct_order)
+TEST_F(parse_assignment_test, parsing_multiple_assignments_produces_tree_in_correct_order)
 {
     std::stringstream input;
     input << "int i = 5;";
@@ -134,7 +101,7 @@ TEST_F(parse_test, parsing_multiple_assignments_produces_tree_in_correct_order)
     EXPECT_EQ(node->left_child->type, token_t::assign);
 }
 
-TEST_F(parse_test, parses_complex_integer_assignment_expression_1)
+TEST_F(parse_assignment_test, parses_complex_integer_assignment_expression_1)
 {
     std::vector<token> tokens = lex_tokens("int i = 5 + 7 * 9;");
     root = parse_tokens(tokens);
@@ -163,7 +130,7 @@ TEST_F(parse_test, parses_complex_integer_assignment_expression_1)
     ASSERT_EQ(right->value, "9");
 }
 
-TEST_F(parse_test, parses_complex_integer_assignment_expression_2)
+TEST_F(parse_assignment_test, parses_complex_integer_assignment_expression_2)
 {
     std::vector<token> tokens = lex_tokens("int i = 5 * 7 + 9;");
     root = parse_tokens(tokens);
@@ -192,7 +159,7 @@ TEST_F(parse_test, parses_complex_integer_assignment_expression_2)
     ASSERT_EQ(right->value, "7");
 }
 
-TEST_F(parse_test, parses_complex_integer_assignment_expression_3)
+TEST_F(parse_assignment_test, parses_complex_integer_assignment_expression_3)
 {
     std::vector<token> tokens = lex_tokens("int i = 3 * 5 + 7 * 9;");
     root = parse_tokens(tokens);
@@ -231,7 +198,7 @@ TEST_F(parse_test, parses_complex_integer_assignment_expression_3)
     EXPECT_EQ(right->value, "9");
 }
 
-TEST_F(parse_test, parses_complex_integer_assignment_expression_4)
+TEST_F(parse_assignment_test, parses_complex_integer_assignment_expression_4)
 {
     std::vector<token> tokens = lex_tokens("int i = 3 + 5 * 7 + 9;");
     root = parse_tokens(tokens);

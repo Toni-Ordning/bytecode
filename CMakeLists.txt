@@ -40,7 +40,8 @@ target_link_libraries(main
 add_executable(unittest
     unittest/main.cpp
     unittest/lex.cpp
-    unittest/parse.cpp
+    unittest/parse_assignment_statement.cpp
+    unittest/parse_if_statement.cpp
     unittest/parse_strategies.cpp
 )
 
